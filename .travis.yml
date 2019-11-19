@@ -42,7 +42,6 @@ jobs:
         - go run build/ci.go test -coverage $TEST_PACKAGES
 
     - stage: build
-      if: type = pull_request
       os: linux
       arch: arm64
       dist: xenial
