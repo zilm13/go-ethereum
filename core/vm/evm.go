@@ -76,6 +76,11 @@ func run(evm *EVM, contract *Contract, input []byte, readOnly bool) ([]byte, err
 	return nil, errors.New("no compatible interpreter")
 }
 
+type BeaconChainContext struct {
+	BeaconRoots []common.Hash // Provides information for BEACONSTATEROOT
+	RandaoMix   common.Hash   // Provides information for RANDAOMIX
+}
+
 // Context provides the EVM with auxiliary information. Once provided
 // it shouldn't be modified.
 type Context struct {
@@ -97,6 +102,7 @@ type Context struct {
 	BlockNumber *big.Int       // Provides information for NUMBER
 	Time        *big.Int       // Provides information for TIME
 	Difficulty  *big.Int       // Provides information for DIFFICULTY
+	BeaconCtx   *BeaconChainContext
 }
 
 // EVM is the Ethereum Virtual Machine base object and provides
