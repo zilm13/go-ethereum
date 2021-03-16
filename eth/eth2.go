@@ -31,6 +31,8 @@ import (
 	"github.com/ethereum/go-ethereum/trie"
 )
 
+const BlockRootsSize = 64
+
 type Eth2API struct {
 	eth  *Ethereum
 	env  *eth2bpenv
@@ -52,11 +54,11 @@ type eth2bpenv struct {
 	receipts []*types.Receipt
 }
 
-func (api *Eth2API) commitTransaction(tx *types.Transaction, coinbase common.Address, bcParentRoots []common.Hash, randao common.Hash) error {
+func (api *Eth2API) commitTransaction(tx *types.Transaction, coinbase common.Address, bcParentRoots []common.Hash, randao common.Hash, slot uint64) error {
 	//snap := eth2rpc.current.state.Snapshot()
 
 	chain := api.eth.BlockChain()
-	receipt, err := core.ApplyTransaction(chain.Config(), chain, &coinbase, api.env.gasPool, api.env.state, api.env.header, tx, &api.env.header.GasUsed, *chain.GetVMConfig(), &vm.BeaconChainContext{bcParentRoots, randao})
+	receipt, err := core.ApplyTransaction(chain.Config(), chain, &coinbase, api.env.gasPool, api.env.state, api.env.header, tx, &api.env.header.GasUsed, *chain.GetVMConfig(), &vm.BeaconChainContext{bcParentRoots, randao, slot})
 	if err != nil {
 		//w.current.state.RevertToSnapshot(snap)
 		return err
@@ -170,7 +172,7 @@ func (api *Eth2API) ProduceBlock(params ProduceBlockParams) (*ExecutableData, er
 
 		// Execute the transaction
 		api.env.state.Prepare(tx.Hash(), common.Hash{}, api.env.tcount)
-		err := api.commitTransaction(tx, coinbase, params.RecentBeaconBlockRoots, params.RandaoMix)
+		err := api.commitTransaction(tx, coinbase, params.RecentBeaconBlockRoots, params.RandaoMix, params.Slot)
 		switch err {
 		case core.ErrGasLimitReached:
 			// Pop the current out-of-gas transaction without shifting in the next from the account
@@ -288,7 +290,7 @@ func (api *Eth2API) InsertBlock(params InsertBlockParams) (bool, error) {
 	number.Add(parent.Number(), big.NewInt(1))
 
 	block := insertBlockParamsToBlock(params, number)
-	_, err := api.eth.BlockChain().InsertChainWithoutSealVerification(types.Blocks([]*types.Block{block}))
+	_, err := api.eth.BlockChain().InsertChainWithoutSealVerification(types.Blocks([]*types.Block{block}), &vm.BeaconChainContext{params.RecentBeaconBlockRoots, params.RandaoMix, params.Slot})
 
 	return (err == nil), err
 }

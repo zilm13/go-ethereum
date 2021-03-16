@@ -79,6 +79,7 @@ func run(evm *EVM, contract *Contract, input []byte, readOnly bool) ([]byte, err
 type BeaconChainContext struct {
 	BeaconRoots []common.Hash // Provides information for BEACONSTATEROOT
 	RandaoMix   common.Hash   // Provides information for RANDAOMIX
+	Slot        uint64        // Current slot, last Beacon root is for (slot - 1)
 }
 
 // Context provides the EVM with auxiliary information. Once provided

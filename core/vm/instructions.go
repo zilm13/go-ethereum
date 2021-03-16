@@ -19,6 +19,7 @@ package vm
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/holiman/uint256"
 	"golang.org/x/crypto/sha3"
@@ -487,20 +488,21 @@ func opBeaconStateRoot(pc *uint64, interpreter *EVMInterpreter, callContext *cal
 		num.Clear()
 		return nil, nil
 	}
-	var upper, lower uint64
-	upper = interpreter.evm.BlockNumber.Uint64()
-	if upper < 257 {
-		lower = 0
-	} else {
-		lower = upper - 256
-	}
-	if num64 >= lower && num64 < upper {
-		num.SetBytes(interpreter.evm.Context.BeaconCtx.BeaconRoots[num64-lower].Bytes())
+	// TODO: safe
+	//	if interpreter.evm.Context.BeaconCtx == nil {
+	//	return nil, nil
+	// }
+	var slot = interpreter.evm.Context.BeaconCtx.Slot
+	var SIZE = uint64(eth.BlockRootsSize) // BeaconRoots size
+	if (slot-num64 < (SIZE + 1)) && (num64 < slot) {
+		var delta = slot - 1 - num64
+		num.SetBytes(interpreter.evm.Context.BeaconCtx.BeaconRoots[(SIZE-1)-delta].Bytes())
 	} else {
 		num.Clear()
 	}
 	return nil, nil
 }
+
 func opRandaoMix(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) ([]byte, error) {
 	callContext.stack.push(new(uint256.Int).SetBytes(interpreter.evm.Context.BeaconCtx.RandaoMix.Bytes()))
 	return nil, nil
