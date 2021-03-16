@@ -19,7 +19,6 @@ package vm
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/holiman/uint256"
 	"golang.org/x/crypto/sha3"
@@ -481,7 +480,7 @@ func opGasLimit(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) (
 	return nil, nil
 }
 
-func opBeaconStateRoot(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) ([]byte, error) {
+func opBeaconBlockRoot(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) ([]byte, error) {
 	num := callContext.stack.peek()
 	num64, overflow := num.Uint64WithOverflow()
 	if overflow {
@@ -493,10 +492,10 @@ func opBeaconStateRoot(pc *uint64, interpreter *EVMInterpreter, callContext *cal
 	//	return nil, nil
 	// }
 	var slot = interpreter.evm.Context.BeaconCtx.Slot
-	var SIZE = uint64(eth.BlockRootsSize) // BeaconRoots size
-	if (slot-num64 < (SIZE + 1)) && (num64 < slot) {
+	var Size = uint64(len(interpreter.evm.Context.BeaconCtx.BeaconRoots))
+	if ((slot - num64) < (Size + 1)) && (num64 < slot) {
 		var delta = slot - 1 - num64
-		num.SetBytes(interpreter.evm.Context.BeaconCtx.BeaconRoots[(SIZE-1)-delta].Bytes())
+		num.SetBytes(interpreter.evm.Context.BeaconCtx.BeaconRoots[(Size-1)-delta].Bytes())
 	} else {
 		num.Clear()
 	}

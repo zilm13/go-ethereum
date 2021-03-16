@@ -31,8 +31,6 @@ import (
 	"github.com/ethereum/go-ethereum/trie"
 )
 
-const BlockRootsSize = 64
-
 type Eth2API struct {
 	eth  *Ethereum
 	env  *eth2bpenv

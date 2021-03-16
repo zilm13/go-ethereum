@@ -1019,8 +1019,8 @@ func newFrontierInstructionSet() JumpTable {
 			halts:      true,
 			writes:     true,
 		},
-		BEACONSTATEROOT: {
-			execute:     opBeaconStateRoot,
+		BEACONBLOCKROOT: {
+			execute:     opBeaconBlockRoot,
 			constantGas: GasExtStep,
 			minStack:    minStack(1, 1),
 			maxStack:    maxStack(1, 1),

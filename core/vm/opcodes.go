@@ -103,7 +103,7 @@ const (
 	GASLIMIT
 	CHAINID         OpCode = 0x46
 	SELFBALANCE     OpCode = 0x47
-	BEACONSTATEROOT OpCode = 0x48
+	BEACONBLOCKROOT OpCode = 0x48
 	RANDAOMIX       OpCode = 0x49
 )
 
@@ -285,7 +285,7 @@ var opCodeToString = map[OpCode]string{
 	GASLIMIT:        "GASLIMIT",
 	CHAINID:         "CHAINID",
 	SELFBALANCE:     "SELFBALANCE",
-	BEACONSTATEROOT: "BEACONSTATEROOT",
+	BEACONBLOCKROOT: "BEACONBLOCKROOT",
 	RANDAOMIX:       "RANDAOMIX",
 
 	// 0x50 range - 'storage' and execution.
@@ -460,7 +460,7 @@ var stringToOp = map[string]OpCode{
 	"DIFFICULTY":      DIFFICULTY,
 	"GASLIMIT":        GASLIMIT,
 	"SELFBALANCE":     SELFBALANCE,
-	"BEACONSTATEROOT": BEACONSTATEROOT,
+	"BEACONBLOCKROOT": BEACONBLOCKROOT,
 	"RANDAOMIX":       RANDAOMIX,
 	"POP":             POP,
 	"MLOAD":           MLOAD,
