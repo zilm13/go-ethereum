@@ -337,7 +337,7 @@ func TestStorage(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
 	}
-	retval, err := v.ToString()
+	retval := v.ToString().String()
 
 	if err != nil {
 		t.Errorf("Unexpected error %v", err)
@@ -437,7 +437,7 @@ func dummyTx(value hexutil.Big) *core.SignTxRequest {
 			To:       to,
 			Value:    value,
 			Nonce:    n,
-			GasPrice: gasPrice,
+			GasPrice: &gasPrice,
 			Gas:      gas,
 		},
 		Callinfo: []core.ValidationInfo{

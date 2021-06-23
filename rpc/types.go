@@ -35,12 +35,6 @@ type API struct {
 	Public    bool        // indication if the methods must be considered safe for public use
 }
 
-// Error wraps RPC errors, which contain an error code in addition to the message.
-type Error interface {
-	Error() string  // returns the message
-	ErrorCode() int // returns the code
-}
-
 // ServerCodec implements reading, parsing and writing RPC messages for the server side of
 // a RPC session. Implementations must be go-routine safe since the codec can be called in
 // multiple go-routines concurrently.
@@ -97,9 +91,8 @@ func (bn *BlockNumber) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	if blckNum > math.MaxInt64 {
-		return fmt.Errorf("Blocknumber too high")
+		return fmt.Errorf("block number larger than int64")
 	}
-
 	*bn = BlockNumber(blckNum)
 	return nil
 }
