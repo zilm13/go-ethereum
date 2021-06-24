@@ -832,6 +832,28 @@ func opPush1(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]by
 	return nil, nil
 }
 
+func opBeaconBlockRoot(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]byte, error) {
+	num := scope.Stack.peek()
+	num64, overflow := num.Uint64WithOverflow()
+	if overflow {
+		num.Clear()
+		return nil, nil
+	}
+	// TODO: safe
+	//	if interpreter.evm.Context.BeaconCtx == nil {
+	//	return nil, nil
+	// }
+	var slot = interpreter.evm.Context.BeaconCtx.Slot
+	var Size = uint64(len(interpreter.evm.Context.BeaconCtx.BeaconRoots))
+	if ((slot - num64) < (Size + 1)) && (num64 < slot) {
+		var delta = slot - 1 - num64
+		num.SetBytes(interpreter.evm.Context.BeaconCtx.BeaconRoots[(Size-1)-delta].Bytes())
+	} else {
+		num.Clear()
+	}
+	return nil, nil
+}
+
 // make push instruction function
 func makePush(size uint64, pushByteSize int) executionFunc {
 	return func(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext) ([]byte, error) {

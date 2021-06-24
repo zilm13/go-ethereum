@@ -24,14 +24,18 @@ import (
 //go:generate go run github.com/fjl/gencodec -type assembleBlockParams -field-override assembleBlockParamsMarshaling -out gen_blockparams.go
 
 // Structure described at https://hackmd.io/T9x2mMA4S7us8tJwEB3FDQ
+// With the addition of EVM data fields
 type assembleBlockParams struct {
 	ParentHash common.Hash `json:"parentHash"    gencodec:"required"`
 	Timestamp  uint64      `json:"timestamp"     gencodec:"required"`
+	Slot       uint64      `json:"slot"     gencodec:"required"`
+	RecentBlockRoots []common.Hash `json:"recentBeaconBlockRoots"     gencodec:"required"`
 }
 
 // JSON type overrides for assembleBlockParams.
 type assembleBlockParamsMarshaling struct {
 	Timestamp hexutil.Uint64
+	Slot hexutil.Uint64
 }
 
 //go:generate go run github.com/fjl/gencodec -type executableData -field-override executableDataMarshaling -out gen_ed.go

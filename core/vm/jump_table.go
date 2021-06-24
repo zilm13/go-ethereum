@@ -58,10 +58,23 @@ var (
 	istanbulInstructionSet         = newIstanbulInstructionSet()
 	berlinInstructionSet           = newBerlinInstructionSet()
 	londonInstructionSet           = newLondonInstructionSet()
+	catalystInstructionSet         = newCatalystInstructionSet()
 )
 
 // JumpTable contains the EVM opcodes supported at a given fork.
 type JumpTable [256]*operation
+
+// Catalyst with BeaconBlockRoot opcode
+func newCatalystInstructionSet() JumpTable {
+	instructionSet := newBerlinInstructionSet()
+	instructionSet[BEACONBLOCKROOT] = &operation{
+		execute:     opBeaconBlockRoot,
+		constantGas: GasExtStep,
+		minStack:    minStack(1, 1),
+		maxStack:    maxStack(1, 1),
+	}
+	return instructionSet
+}
 
 // newLondonInstructionSet returns the frontier, homestead, byzantium,
 // contantinople, istanbul, petersburg, berlin and london instructions.

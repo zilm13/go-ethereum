@@ -94,6 +94,12 @@ type BlockContext struct {
 	Time        *big.Int       // Provides information for TIME
 	Difficulty  *big.Int       // Provides information for DIFFICULTY
 	BaseFee     *big.Int       // Provides information for BASEFEE
+	BeaconCtx   *BeaconChainContext // Provides information for BEACONBLOCKROOT
+}
+
+type BeaconChainContext struct {
+	BeaconRoots []common.Hash // Provides information for BEACONBLOCKROOT
+	Slot        uint64        // Current slot, last Beacon root is for (slot - 1)
 }
 
 // TxContext provides the EVM with information about a transaction.

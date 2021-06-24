@@ -17,6 +17,7 @@
 package catalyst
 
 import (
+	"github.com/ethereum/go-ethereum/common"
 	"math/big"
 	"testing"
 
@@ -121,6 +122,8 @@ func TestEth2AssembleBlock(t *testing.T) {
 	blockParams := assembleBlockParams{
 		ParentHash: blocks[8].ParentHash(),
 		Timestamp:  blocks[8].Time(),
+		Slot: 8,
+		RecentBlockRoots: []common.Hash{},
 	}
 	execData, err := api.AssembleBlock(blockParams)
 
@@ -145,6 +148,8 @@ func TestEth2AssembleBlockWithAnotherBlocksTxs(t *testing.T) {
 	blockParams := assembleBlockParams{
 		ParentHash: blocks[9].ParentHash(),
 		Timestamp:  blocks[9].Time(),
+		Slot: 9,
+		RecentBlockRoots: []common.Hash{},
 	}
 	execData, err := api.AssembleBlock(blockParams)
 	if err != nil {

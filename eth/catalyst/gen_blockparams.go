@@ -17,10 +17,14 @@ func (a assembleBlockParams) MarshalJSON() ([]byte, error) {
 	type assembleBlockParams struct {
 		ParentHash common.Hash    `json:"parentHash"    gencodec:"required"`
 		Timestamp  hexutil.Uint64 `json:"timestamp"     gencodec:"required"`
+		Slot       hexutil.Uint64      `json:"slot"     gencodec:"required"`
+		RecentBlockRoots []common.Hash `json:"recentBeaconBlockRoots"     gencodec:"required"`
 	}
 	var enc assembleBlockParams
 	enc.ParentHash = a.ParentHash
 	enc.Timestamp = hexutil.Uint64(a.Timestamp)
+	enc.Slot = hexutil.Uint64(a.Slot)
+	enc.RecentBlockRoots = a.RecentBlockRoots
 	return json.Marshal(&enc)
 }
 
@@ -29,6 +33,8 @@ func (a *assembleBlockParams) UnmarshalJSON(input []byte) error {
 	type assembleBlockParams struct {
 		ParentHash *common.Hash    `json:"parentHash"    gencodec:"required"`
 		Timestamp  *hexutil.Uint64 `json:"timestamp"     gencodec:"required"`
+		Slot       *hexutil.Uint64      `json:"slot"     gencodec:"required"`
+		RecentBlockRoots *[]common.Hash `json:"recentBeaconBlockRoots"     gencodec:"required"`
 	}
 	var dec assembleBlockParams
 	if err := json.Unmarshal(input, &dec); err != nil {
@@ -42,5 +48,13 @@ func (a *assembleBlockParams) UnmarshalJSON(input []byte) error {
 		return errors.New("missing required field 'timestamp' for assembleBlockParams")
 	}
 	a.Timestamp = uint64(*dec.Timestamp)
+	if dec.Slot == nil {
+		return errors.New("missing required field 'slot' for assembleBlockParams")
+	}
+	a.Slot = uint64(*dec.Slot)
+	if dec.RecentBlockRoots == nil {
+		return errors.New("missing required field 'recentBeaconBlockRoots' for assembleBlockParams")
+	}
+	a.RecentBlockRoots = *dec.RecentBlockRoots
 	return nil
 }

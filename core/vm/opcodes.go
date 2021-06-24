@@ -104,6 +104,7 @@ const (
 	CHAINID     OpCode = 0x46
 	SELFBALANCE OpCode = 0x47
 	BASEFEE     OpCode = 0x48
+	BEACONBLOCKROOT OpCode = 0x49
 )
 
 // 0x50 range - 'storage' and execution.
@@ -282,6 +283,7 @@ var opCodeToString = map[OpCode]string{
 	CHAINID:     "CHAINID",
 	SELFBALANCE: "SELFBALANCE",
 	BASEFEE:     "BASEFEE",
+	BEACONBLOCKROOT: "BEACONBLOCKROOT",
 
 	// 0x50 range - 'storage' and execution.
 	POP: "POP",
@@ -435,6 +437,7 @@ var stringToOp = map[string]OpCode{
 	"CALLDATACOPY":   CALLDATACOPY,
 	"CHAINID":        CHAINID,
 	"BASEFEE":        BASEFEE,
+	"BEACONBLOCKROOT":BEACONBLOCKROOT,
 	"DELEGATECALL":   DELEGATECALL,
 	"STATICCALL":     STATICCALL,
 	"CODESIZE":       CODESIZE,

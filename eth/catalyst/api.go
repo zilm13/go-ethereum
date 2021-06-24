@@ -20,6 +20,7 @@ package catalyst
 import (
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/core/vm"
 	"math/big"
 	"time"
 
@@ -78,10 +79,10 @@ type blockExecutionEnv struct {
 	receipts []*types.Receipt
 }
 
-func (env *blockExecutionEnv) commitTransaction(tx *types.Transaction, coinbase common.Address) error {
+func (env *blockExecutionEnv) commitTransaction(tx *types.Transaction, coinbase common.Address, beaconCtx *vm.BeaconChainContext) error {
 	vmconfig := *env.chain.GetVMConfig()
 	snap := env.state.Snapshot()
-	receipt, err := core.ApplyTransaction(env.chain.Config(), env.chain, &coinbase, env.gasPool, env.state, env.header, tx, &env.header.GasUsed, vmconfig)
+	receipt, err := core.ApplyTransaction(env.chain.Config(), env.chain, &coinbase, env.gasPool, env.state, env.header, tx, &env.header.GasUsed, vmconfig, beaconCtx)
 	if err != nil {
 		env.state.RevertToSnapshot(snap)
 		return err
@@ -179,7 +180,11 @@ func (api *consensusAPI) AssembleBlock(params assembleBlockParams) (*executableD
 
 		// Execute the transaction
 		env.state.Prepare(tx.Hash(), common.Hash{}, env.tcount)
-		err = env.commitTransaction(tx, coinbase)
+		beaconCtx := &vm.BeaconChainContext{
+			BeaconRoots: params.RecentBlockRoots,
+			Slot: params.Slot,
+		}
+		err = env.commitTransaction(tx, coinbase, beaconCtx)
 		switch err {
 		case core.ErrGasLimitReached:
 			// Pop the current out-of-gas transaction without shifting in the next from the account
