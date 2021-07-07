@@ -94,7 +94,6 @@ type BlockContext struct {
 	Time        *big.Int       // Provides information for TIME
 	Difficulty  *big.Int       // Provides information for DIFFICULTY
 	BaseFee     *big.Int       // Provides information for BASEFEE
-	BeaconCtx   *BeaconChainContext // Provides information for BEACONBLOCKROOT
 }
 
 type BeaconChainContext struct {

@@ -20,6 +20,7 @@ package state
 import (
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/core/vm"
 	"math/big"
 	"sort"
 	"time"
@@ -42,7 +43,8 @@ type revision struct {
 
 var (
 	// emptyRoot is the known root hash of an empty trie.
-	emptyRoot = common.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
+	emptyRoot       = common.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
+	latestBeaconCtx = &vm.BeaconChainContext{}
 )
 
 type proofList [][]byte
@@ -1042,4 +1044,12 @@ func (s *StateDB) AddressInAccessList(addr common.Address) bool {
 // SlotInAccessList returns true if the given (address, slot)-tuple is in the access list.
 func (s *StateDB) SlotInAccessList(addr common.Address, slot common.Hash) (addressPresent bool, slotPresent bool) {
 	return s.accessList.Contains(addr, slot)
+}
+
+func (s *StateDB) StoreBeaconContext(beaconCtx *vm.BeaconChainContext) {
+	latestBeaconCtx = beaconCtx
+}
+
+func (s *StateDB) GetBeaconContext() *vm.BeaconChainContext {
+	return latestBeaconCtx
 }

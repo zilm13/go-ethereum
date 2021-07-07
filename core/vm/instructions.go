@@ -839,15 +839,16 @@ func opBeaconBlockRoot(pc *uint64, interpreter *EVMInterpreter, scope *ScopeCont
 		num.Clear()
 		return nil, nil
 	}
-	if interpreter.evm.Context.BeaconCtx == nil {
+	beaconCtx := interpreter.evm.StateDB.GetBeaconContext()
+	if beaconCtx == nil {
 		num.Clear()
 		return nil, nil
 	}
-	var slot = interpreter.evm.Context.BeaconCtx.Slot
-	var Size = uint64(len(interpreter.evm.Context.BeaconCtx.BeaconRoots))
+	var slot = beaconCtx.Slot
+	var Size = uint64(len(beaconCtx.BeaconRoots))
 	if ((slot - num64) < (Size + 1)) && (num64 < slot) {
 		var delta = slot - 1 - num64
-		num.SetBytes(interpreter.evm.Context.BeaconCtx.BeaconRoots[(Size-1)-delta].Bytes())
+		num.SetBytes(beaconCtx.BeaconRoots[(Size-1)-delta].Bytes())
 	} else {
 		num.Clear()
 	}

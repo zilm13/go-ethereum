@@ -79,10 +79,10 @@ type blockExecutionEnv struct {
 	receipts []*types.Receipt
 }
 
-func (env *blockExecutionEnv) commitTransaction(tx *types.Transaction, coinbase common.Address, beaconCtx *vm.BeaconChainContext) error {
+func (env *blockExecutionEnv) commitTransaction(tx *types.Transaction, coinbase common.Address) error {
 	vmconfig := *env.chain.GetVMConfig()
 	snap := env.state.Snapshot()
-	receipt, err := core.ApplyTransaction(env.chain.Config(), env.chain, &coinbase, env.gasPool, env.state, env.header, tx, &env.header.GasUsed, vmconfig, beaconCtx)
+	receipt, err := core.ApplyTransaction(env.chain.Config(), env.chain, &coinbase, env.gasPool, env.state, env.header, tx, &env.header.GasUsed, vmconfig)
 	if err != nil {
 		env.state.RevertToSnapshot(snap)
 		return err
@@ -160,6 +160,13 @@ func (api *consensusAPI) AssembleBlock(params assembleBlockParams) (*executableD
 		return nil, err
 	}
 
+	// Store BeaconChain context
+	beaconCtx := &vm.BeaconChainContext{
+		BeaconRoots: params.RecentBlockRoots,
+		Slot:        params.Slot,
+	}
+	env.state.StoreBeaconContext(beaconCtx)
+
 	var (
 		signer       = types.MakeSigner(bc.Config(), header.Number)
 		txHeap       = types.NewTransactionsByPriceAndNonce(signer, pending, nil)
@@ -180,11 +187,7 @@ func (api *consensusAPI) AssembleBlock(params assembleBlockParams) (*executableD
 
 		// Execute the transaction
 		env.state.Prepare(tx.Hash(), common.Hash{}, env.tcount)
-		beaconCtx := &vm.BeaconChainContext{
-			BeaconRoots: params.RecentBlockRoots,
-			Slot: params.Slot,
-		}
-		err = env.commitTransaction(tx, coinbase, beaconCtx)
+		err = env.commitTransaction(tx, coinbase)
 		switch err {
 		case core.ErrGasLimitReached:
 			// Pop the current out-of-gas transaction without shifting in the next from the account
